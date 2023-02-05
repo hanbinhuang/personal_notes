@@ -1,0 +1,4 @@
+SDK：软件开发包，包含Linux系统开发用到的各种系统源码，驱动，工具，应用软件包。
+
+buildroot是Linux平台Git上的一个自动构建框架，由Makefile文件和Kconfig配置。可通过buildroot配置，编译出完整的可直接烧写到机器上运行的Linux系统软件
+
