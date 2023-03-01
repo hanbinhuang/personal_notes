@@ -24,4 +24,10 @@ git commit --amend
 
 Pick 表示合并，f表示不合并
 
+
+
+
+
+
+
  git log -p -30 .config 查看配置宏的更改记录

@@ -1,0 +1,15 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make.exe: Entering directory 'f:/-------- �ĵ��� --------/��˾�ĵ�/��ҵ/�ƺ���/socketTest'
+make.exe: Leaving directory 'f:/-------- �ĵ��� --------/��˾�ĵ�/��ҵ/�ƺ���/socketTest'
+ 
+Makefile:1: /rules.mk: No such file or directory
+Makefile:2: /kernel.mk: No such file or directory
+Makefile:14: /package.mk: No such file or directory
+make.exe: *** No rule to make target '/package.mk'.
+make.exe: *** No rule to make target '/kernel.mk'.
+make.exe: *** No rule to make target '/rules.mk'.
+make.exe: Failed to remake makefile '/package.mk'.
+make.exe: Failed to remake makefile '/kernel.mk'.
+make.exe: Failed to remake makefile '/rules.mk'.
+make.exe: *** No targets specified and no makefile found.  Stop.
+
