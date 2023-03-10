@@ -8,13 +8,19 @@
 
 ![image-20230225154814018](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230225154814018.png)
 
-**CPU**:   MT7981B    
-**无线收发芯片**：MT77976DA  
-**交换芯片**：MT7531AE  
-**网口**：RJ45，共有4个，其中WAN口（1）直接接在CPU上，LAN口（3）由交换芯片分配  
-**RFID芯片**：FM17580    
-**FLASH**（16M）： SPI Nor flash/Winbond W25Q128JVSIQ    
-**内存**（256M）：DDR3  
+
+
+## 1.2. 设备模块
+
+**（1）CPU**:   MT7981B    
+**（2）无线收发芯片**：MT77976DA  
+**（3）交换芯片（switch）**：MT7531AE  
+**（4）RFID芯片**：FM17580    
+**（5）FLASH**（16M = 128 / 8bit）： SPI Nor flash/Winbond W25Q128JVSIQ    
+**（6）内存**（256M）：DDR3    
+**（7）网口**：RJ45，共有4个，其中WAN口（1个）直接接在CPU上，LAN口（3个）由交换芯片分配    
+		**①WAN口**：广域网接口，主要是用于设备与广域网进行连接，一般连接光猫或其他网络设备;  
+		**②LAN口**:局域网接口，主要是用于链接局域网中的设备，包括电脑、交换机、打印机等设备;
 
 
 
@@ -40,6 +46,7 @@
 ​		VLAN = Virtual Local Area Network = 虚拟局域网。
 
 ​		**作用：**一种将局域网设备从逻辑上划分成一个个网段，从而实现虚拟工作组的数据交换技术，即：  
+​				将一个物理LAN在逻辑行划分为多个广播域，VLAN内可直接通信，VLAN间不可之间通信（广播报文限制字一个VLAN中）  
 ​				一个VLAN = 一个逻辑子网 = 一个逻辑广播域。    
 ​		**协议：**802.1Q。
 
@@ -99,25 +106,27 @@
 ​		**2.VLAN成员表**：用以指定端口是否在VLAN中。（swconfig 最后的vlan对应的port）  
 ​		**3.VLAN输出tag表**：用以确定报文在输出时是否带有tag。
 
-## 2.3. Access与Trunk端口、tag与untag、PVID
+## 2.3. 接口类型、以太网帧格式、PVID
 
-### 2.3.1. Access与Trunk端口的概念
+### 2.3.1. 接口类型
 
-​		**1. Access端口：**一般用于连接计算机的端口。（只可传送一个VLAN包）  
-​		三元素：  
+​		**（1）Access端口：**该端口一般用于连接不能识别Tag的终端设备。（只可传送一个VLAN包）  
+​		  **<1>三元素**：  
 ​				①VLAN成员表：用户指定，但是只能在一个VLAN中。  
 ​				②PVID：无需指定，PVID和端口所在VLAN一样。  
-​				③VLAN输出tag表：输出始终为untagged。  
-​		**2.Trunk端口：** 一般用于交换机之间的连接。（可传送多个VLAN包）  
-​		三元素：  
+​				③VLAN输出tag表：**输出始终为untagged**。   
+​	      **<2>设备举例**：计算机，服务器，机顶盒等设备   
+​		**（2）Trunk端口：**该端口一般用于可同时收发Tag与Untag的终端设备之间的连接。（可传送多个VLAN包）  
+​		  **<1>三元素**：  
 ​				①VLAN成员表：用户指定，Trunk口可在多个VLAN中。缺省情况在设备所创建的所有VLAN中。  
 ​				②PVID：需要用户指定，指定方式为配置端口的Native VLAN。若未指定，缺省为1。  
-​				③VLAN输出tag表：若输出报文是在端口的Native vlan中，即untagged输出，否则tag输出。
+​				③VLAN输出tag表：**若输出报文是在端口的Native vlan中，即untagged输出，否则均为tag输出**。  
+​		  **<2>设备举例**：交换机，路由器，AP等设备。
 
-### 2.3.2. tag与untag的概念
+### 2.3.2.以太网帧格式
 
-​		**① tag**:指以太网数据帧中携带4字节802.1Q信息的VLAN标签，其中vlan id用于指名数据包属于哪个vlan。  
-​		**② untag**:指以太网数据帧中不携带数据包802.1Q信息的VLAN标签，不属于任何vlan。
+​		**① tag帧**:指以太网数据帧中**携带4字节802.1Q信息的VLAN标签**，其中vlan id用于指名数据包属于哪个vlan。  
+​		**② untag帧**:指以太网数据帧中**不携带数据包802.1Q信息的VLAN标签**，不属于任何vlan。
 
 ### 2.3.3. PVID概念
 
@@ -154,9 +163,10 @@
      <td>Trunk口
      <td>若PVID = 端口允许的VLAN列表中：接收并为报文打上PVID的tag<br>若PVID != 端口允许的VLAN列表中：  丢弃报文
      <td>若tag的VLAN ID = 端口允许的VLAN列表中：接收报文<br>若tag的VLAN ID != 端口允许的VLAN列表中：   丢弃报文
-     <td> (前面可知报文有：①tag VID为PVID，②tag VID为端口允许VLAN列表中)<br>①发送的报文为untag<br>②发生的报文为tag+原VID 
+     <td> (前面可知报文有：①tag VID为PVID，②tag VID为端口允许VLAN列表中)<br>①发送的报文为untag<br>②发送的报文为原有tag 
     </tr>
 </table>    
+
 
 ### 2.3.5. VLAN中的ports字段
 
@@ -168,19 +178,27 @@
 ​		pvid：端口上未标记的入站数据包被分配了VID  
 ​		若入端口的数据报为untag，则会被加上PVID tag
 
+### 2.3.6. VLAN通信
+
+![image-20230302213324131](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230302213324131.png)
+
+![image-20230302213331662](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230302213331662.png)
+
+
+
 ## 2.4. 二三层转发
 
 ### 2.4.1. 二层转发
 
-**(1)概念**：  
+**(1) 概念**：  
 		OSI七层模型中**第二层链路层**，根据报文的**目的mac地址**对报文进行转发，故称为二层转发。  
-		二层转发中不对报文的头部做任何修改。  
-**(2)二层设备：网桥.**  
+		二层转发中**不对报文的头部做任何修改**。  
+**(2) 二层设备：网桥.**  
 		**①特点**：可连接不同速率的链路，不限制连接网段，错误检测，流量控制，较集线器相比，可起到过滤的作用。  
 		**②作用**：连接两个网络的设备（根据MAC地址处理），分析目的MAC地址字段是否在对方网络上，并据此决定是否将报文转发到对方网络。  
- **(3)桥接：**  
+ **(3) 桥接：**  
 		即将两台在同一网段的设备通过网桥连接在一起，网桥下的设备可根据MAC地址把设备上的报文原封不动的送给另一台设备，故可说网桥设备在整个链路上是透明的。  
-**(4)FDB表（转发信息表）：**  
+**(4) FDB表（转发信息表）：**  
 		每个网桥内部维护一张FDB表，包含信息如下：  
 				1.mac：设备的MAC地址。  
 				2.port: 对应设备连接的端口。  
@@ -188,7 +206,7 @@
 		FDB表的老化：定时清理长时间不用/无效的表项。  
 **(5)相关命令**：  
 		**刷新mac表**：`swconfig dev switch0 set flush_arl`	  
-		**输出mac表：**`mactable`
+		**输出mac表：**`mactable/`
 
 ### 2.4.2.三层转发
 
@@ -217,6 +235,34 @@
 
 **PS:**   
 		网段 = IP地址+子网掩码计算后的网络号
+
+### 2.4.3. 转发模式
+
+​	**（1）桥转发**：**同网段下**，终端报文经过设备后，直接根据设备内维护的**转发表**，把报文直接原封不动的转发出去。
+
+​	**（2）路由转发**：**不同网段下**，终端仍可以直接相互访问，是通过设备的**路由表**进行转发的。
+
+​	**（3）NAT转发**：路由器将从终端收到的报文和转发给终端的报文进行地址替换的转发方式。
+
+### 2.4.4. 实际场景
+
+​	**（1）直连**
+
+![image-20230303085925067](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230303085925067.png)
+
+​	**（2）桥转发**
+
+![image-20230303085942017](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230303085942017.png)
+
+​	**（3）路由转发**
+
+![image-20230303090139337](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230303090139337.png)
+
+​	**（4）NAT转发**
+
+![image-20230303090301138](C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20230303090301138.png)
+
+
 
 ## 3.组件说明
 

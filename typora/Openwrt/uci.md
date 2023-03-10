@@ -53,40 +53,40 @@ PS:
 
 ​		详细示例：[uci](https://blog.csdn.net/hzlarm/article/details/102993291)
 
-| 命令                                             | 功能                                                         | 举例 |
-| ------------------------------------------------ | :----------------------------------------------------------- | ---- |
-| batch                                            | 批处理uci命令，需把每条命令前的字符串”uci”去掉               |      |
-| export     [<config>]                            | 显示UCI可读取到的某配置文件的信息<br />(包括已修改但未提交内容)。 |      |
-| import     [<config>]                            | 以uci语法导入配置文件                                        |      |
-| changes    [<config>]                            | 列出配置文件未提交的内容<br />若未指定配置文件，则导出所有配置文件的修改 |      |
-| commit     [<config>]                            | 提交给定的配置文件修改内容，<br />若未指定参数则将所有的配置文件写入文件系统 |      |
-| add        <config> <section-type>               | 增加指定配置文件的类型为section-type的匿名区段               |      |
-| add_list   <config>.<section>.<option>=<string>  | 对已存在的list选项增加字符串                                 |      |
-| del_list   <config>.<section>.<option>=<string>  | 删除已存在的list选项的字符串                                 |      |
-| show       [<config>[.<section>[.<option>]]]     | 显示指定的选项、配置节或配置文件                             |      |
-| get        <config>.<section>[.<option>]         | 获取指定区段选项的值                                         |      |
-| set        <config>.<section>[.<option>]=<value> | 设置指定配置节选项的值，<br />或增加一个配置节，类型设置为指定的值 |      |
-| delete     <config>[.<section>[[.<option>][=]]]  | 删除指定配置节或选项                                         |      |
-| rename     <config>.<section>[.<option>]=<name>  | 对指定的选项或配置节重命名                                   |      |
-| revert     <config>[.<section>[.<option>]]       | 恢复指定的选项，配置节或配置文件                             |      |
-| reorder    <config>.<section>=<position>         | 修改配置项config在文件中的位置；<br />优先级0最大，数字越大越排后 |      |
+| 命令                                             | 功能                                                         |
+| ------------------------------------------------ | :----------------------------------------------------------- |
+| batch                                            | 批处理uci命令，需把每条命令前的字符串”uci”去掉               |
+| export     [<config>]                            | 显示UCI可读取到的某配置文件的信息<br />(包括已修改但未提交内容)。 |
+| import     [<config>]                            | 以uci语法导入配置文件                                        |
+| changes    [<config>]                            | 列出配置文件未提交的内容<br />若未指定配置文件，则导出所有配置文件的修改 |
+| commit     [<config>]                            | 提交给定的配置文件修改内容，<br />若未指定参数则将所有的配置文件写入文件系统 |
+| add        <config> <section-type>               | 增加指定配置文件的类型为section-type的匿名区段               |
+| add_list   <config>.<section>.<option>=<string>  | 对已存在的list选项增加字符串                                 |
+| del_list   <config>.<section>.<option>=<string>  | 删除已存在的list选项的字符串                                 |
+| show       [<config>[.<section>[.<option>]]]     | 显示指定的选项、配置节或配置文件                             |
+| get        <config>.<section>[.<option>]         | 获取指定区段选项的值                                         |
+| set        <config>.<section>[.<option>]=<value> | 设置指定配置节选项的值，<br />或增加一个配置节，类型设置为指定的值 |
+| delete     <config>[.<section>[[.<option>][=]]]  | 删除指定配置节或选项                                         |
+| rename     <config>.<section>[.<option>]=<name>  | 对指定的选项或配置节重命名                                   |
+| revert     <config>[.<section>[.<option>]]       | 恢复指定的选项，配置节或配置文件                             |
+| reorder    <config>.<section>=<position>         | 修改配置项config在文件中的位置；<br />优先级0最大，数字越大越排后 |
 
 ## 2.2.options
 
-| 选项      | 功能                                                | 举例 |
-| :-------- | --------------------------------------------------- | ---- |
-| -c <path> | 设置当前命令配置文件的搜索路径（默认：/etc/config） |      |
-| -d <str>  | 设置uci show 中列表值的分隔符                       |      |
-| -f <file> | 使用某文件作为替代stdin作为输入                     |      |
-| -m        | 导入时，将数据合并到现有包中                        |      |
-| -n        | 导出时命名未命名的节（默认）                        |      |
-| -N        | 不要命名未命名的节                                  |      |
-| -p <path> | 为配置更改文件添加搜索路径                          |      |
-| -P <path> | 为配置更改文件添加搜索路径并将其用作默认值          |      |
-| -q        | 静默模式（不打印任何错误信息）                      |      |
-| -s        | 强制严格模式（解析器错误时停止，默认）              |      |
-| -S        | 禁用严格模式                                        |      |
-| -X        | 不要在“show”上使用扩展语法                          |      |
+| 选项      | 功能                                                |
+| :-------- | --------------------------------------------------- |
+| -c <path> | 设置当前命令配置文件的搜索路径（默认：/etc/config） |
+| -d <str>  | 设置uci show 中列表值的分隔符                       |
+| -f <file> | 使用某文件作为替代stdin作为输入                     |
+| -m        | 导入时，将数据合并到现有包中                        |
+| -n        | 导出时命名未命名的节（默认）                        |
+| -N        | 不要命名未命名的节                                  |
+| -p <path> | 为配置更改文件添加搜索路径                          |
+| -P <path> | 为配置更改文件添加搜索路径并将其用作默认值          |
+| -q        | 静默模式（不打印任何错误信息）                      |
+| -s        | 强制严格模式（解析器错误时停止，默认）              |
+| -S        | 禁用严格模式                                        |
+| -X        | 不要在“show”上使用扩展语法                          |
 
 
 
@@ -129,7 +129,17 @@ PS:
 
 ### 3.2.2. confIg_开头函数
 
-
+| 函数                                                 | 功能                                                         |
+| ---------------------------------------------------- | ------------------------------------------------------------ |
+| config_load  <config>                                | 调用uci_load函数从配置文件中读取配置选项，设置到环境变量中   |
+| config_get  <var> <section> <option> [<default>]     | 从环境变量中获取配置值，<br />var:用来存储config值的变量，section/option:要获取节点/选项的名字 |
+| config_get_bool                                      | 从当前设置的环境变量中获取布尔值                             |
+| config_set  <section> <option> <value>               | 将变量设置到环境变量中。（注意：未配置文件中）               |
+| config_foreach <callback_func> [<section type>]      | 将section type作为参数进行遍历调用callback_func函数。<br />第一个参数为回调函数，第二个参数为配置节类型 |
+| config_list_foreach <section> <list> <callback_func> | 遍历section下list的option值作为参数调用回调函数              |
+| config_unset <section> <option>                      | 清空 <section>.<option> value值                              |
+| insert_modules                                       | 加载/etc/modus.d/*下面的所有模块                             |
+|                                                      |                                                              |
 
 
 

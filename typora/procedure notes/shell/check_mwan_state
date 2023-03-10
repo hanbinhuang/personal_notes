@@ -1,0 +1,160 @@
+#!/bin/sh
+
+CHECK_MWAN_STATE_LOG="/tmp/mwan/check_mwan_state.log"
+CHECK_MWAN_STATE_LOG_SIZE=5        # 日志文件大小, 单位KB; du最小都是4k，而且是4的整数倍，故不能设置小于4k。
+
+mkdir -p "/tmp/mwan/"
+
+debug_log()
+{
+    local cur_time=$(date "+[%Y-%m-%d %H:%M:%S]")
+	local file_size
+	if [ -e $CHECK_MWAN_STATE_LOG ] ; then
+		file_size=$(du -shk $CHECK_MWAN_STATE_LOG | awk '{print $1}' | tr -d ' \n\t')
+	else
+		file_size=0
+	fi
+
+	[ $file_size  -gt $CHECK_MWAN_STATE_LOG_SIZE ] && {
+		mv -f $CHECK_MWAN_STATE_LOG ${CHECK_MWAN_STATE_LOG}.old
+	}
+
+	echo -e "${cur_time} ${1}" >> $CHECK_MWAN_STATE_LOG
+}
+
+[ -z "$1" ] && echo "Error: should not be started manually" && exit 0
+
+if [ -e /var/run/check_mwan_state.pid ] ; then
+	kill -9 $(cat /var/run/check_mwan_state.pid) &> /dev/null
+	rm /var/run/check_mwan_state.pid &> /dev/null
+fi
+
+echo "$$" > /var/run/check_mwan_state.pid
+
+get_sw_port()
+{
+	local cfg="$1"
+	local port=""
+	local switch=""
+	let i=0
+	local ifname
+	local cpu_port_switch0=""
+	local cpu_port_switch1=""
+	local iptv_port
+
+	ifname=`uci get network.$cfg.ifname  2>/dev/null`
+	if [ -z "$ifname" ]; then
+		echo $port
+		return
+	fi
+	#通过ifname找到对应的vid
+	vid=`echo "$ifname" | awk -F '.' '{print $NF}'`
+	if [ -z "$vid" ]; then
+		echo $port
+		return
+	fi
+	sw_num=`uci show network | grep "switch_vlan" | grep -w "device=" | grep -w "switch" | wc -l`
+	if [ "$sw_num" = "0" ]; then
+		sw_num=`uci show network | grep "switch_vlan" | wc -l`
+	fi
+	#获取CPU port(第一个是switch0，第二个是switch1)
+	for cpu_port in $(cat /tmp/rg_device/rg_device.json  | jq .|grep to_cpu\"|awk -F "[\"\"]" '{print $4}'); do
+		if [ "$cpu_port_switch0" == "" ]; then
+			cpu_port_switch0=$cpu_port
+		else
+			cpu_port_switch1=$cpu_port
+		fi
+	done
+	#获取iptv port口
+	iptv_port=`uci -q get iptv.iptv_info.ports |sed "s/,U//g" 2>/dev/null`
+	while [ $i -lt $((sw_num)) ]; do
+		if [ `uci get network.@switch_vlan[$i].vlan` = "$vid" ]; then
+			switch=`uci get network.@switch_vlan[$i].device`
+			#通过vid查询对应的ports, 先过滤掉0t
+			if [ "$switch" == "switch0" ]; then
+				port=`uci get network.@switch_vlan[$i].ports | sed "s/t//g"  | sed "s/[$cpu_port_switch0 $iptv_port]//g"  | awk '{print $NF}'`
+			else
+				port=`uci get network.@switch_vlan[$i].ports | sed "s/t//g"  | sed "s/[$cpu_port_switch1 $iptv_port]//g"  | awk '{print $NF}'`
+			fi
+			if [ -n "$port" -a -n "$switch" ] && [ "$port" != " " ]; then
+				echo $port $switch
+				return
+			fi
+		fi
+		let i++
+	done
+	echo $port
+}
+
+check_state()
+{
+	local state
+	local last_state
+	local port
+	local switch
+	port=$2
+	switch=$3
+	if [ -z "$switch" ]; then
+		switch="switch0"
+	fi
+
+	#判断交互芯片物理口状态(网线是否插了)
+	state=`swconfig dev ${switch} port ${port} show | grep "link:up"`
+	if [ -z "$state" ]; then
+		state=0
+	else
+		state=1
+	fi
+
+	#判断接口是否存在
+	last_state=`ifconfig br-${1} 2>/dev/null`
+	if [ -z "$last_state" ];then
+		if [ $state -eq 1 ];then
+			ifup $1 2>/dev/null
+			debug_log "ifup $1 when interface is not exist and port($port) is up."
+		fi
+		return
+	fi
+
+	#判断接口是否执行过ifdown
+	last_state=`ifstatus ${1} | grep "autostart" | grep true`
+	if [ -z "$last_state" ]; then
+		last_state=0
+	else
+		last_state=1
+	fi
+	if [ $state -eq $last_state ]; then
+		return
+	fi
+	if [ $state -eq 0 ]; then
+		ifdown $1 2>/dev/null
+		debug_log "ifdown $1 when interface is running."
+	else
+		ifup $1 2>/dev/null
+		debug_log "ifup $1 when interface is not running."
+	fi
+}
+
+while [ 1 ]
+do
+	sleep 5
+	port=`get_sw_port "wan"`
+	debug_log "port:$port"
+	if [ -n "$port" ]; then
+		check_state "wan" $port
+	fi
+	port=`get_sw_port "wan1"`
+	if [ -n "$port" ]; then
+		check_state "wan1" $port
+	fi
+	#直接就硬编码吧。
+	port=`get_sw_port "wan2"`
+	if [ -n "$port" ]; then
+		check_state "wan2" $port
+	fi
+	port=`get_sw_port "wan3"`
+	if [ -n "$port" ]; then
+		check_state "wan3" $port
+	fi
+done
+exit 0
